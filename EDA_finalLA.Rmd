@@ -1,0 +1,340 @@
+---
+title: "Netflix Dataset"
+author: "Amith MM-1NT19IS047 CHITTENI SAI SANJAY-1NT19IS047"
+date: '2022-06-23'
+output:
+  html_document:
+    df_print: paged
+  word_document: default
+  pdf_document: default
+---
+
+##About Dataset
+Context
+
+This dataset consists of all Netflix original films released as of June 1st, 2021. Additionally, it also includes all Netflix documentaries and specials. The data was webscraped off of this Wikipedia page, which was then integrated with a dataset consisting of all of their corresponding IMDB scores. IMDB scores are voted on by community members, and the majority of the films have 1,000+ reviews.
+
+Content
+Included in the dataset is:
+
+Title of the film
+Genre of the film
+Original premiere date
+Runtime in minutes
+IMDB scores (as of 06/01/21)
+Languages currently available (as of 06/01/21)
+```{r}
+getwd()
+```
+## Loading Data
+```{r}
+setwd("~/Desktop")
+```
+```{r}
+ netflix_data=read.csv("NetflixOriginals.csv", sep = ",", header = TRUE)
+```
+```{r}
+head(netflix_data)
+```
+## Details of Data
+```{r}
+class(netflix_data)
+```
+The function “class()” returns “data.frame”, this is the data structure that the data is stored in, this owes to the fact that each of the columns are of different data types i.e they are heterogenous.
+
+```{r}
+typeof(netflix_data)
+```
+The function “typeof()” returns “list” as this is how the data.frame is stored in the memory, each column as a list.
+
+```{r}
+names(netflix_data)
+```
+
+```{r}
+dim(netflix_data)
+```
+Using the function “dim()” we find that the data has 17562 rows and 34 columns.
+```{r}
+names(netflix_data)
+```
+We can use the function “names()” to return the names of all the columns of the data
+```{r}
+str(netflix_data)
+```
+Here, we use the function “str()” to specify the structure of the data, there’s a lot to be inferred from the output here some of these include, Our first column is “Title” which is the ID assigned to the data from the source it was scrapped from, it is of integer data type and has values as specified next to it. There are multiple columns of the data type character and we’re shown the various values this category takes. Following this we have data such as
+```{r}
+summary(netflix_data)
+```
+Using the command “summary()” we get summary statistics for the data, if the attribute is of data type integer, then we receive 6 critical statistical information, this is minimum value, 1st quartile, median/2nd quartile, mean, 3rd quartile and maximum value. One might notice that all of the Score attributes here are of the data type character, which might raise some issues when attempting to perform certain functions on these attributes later down. These will be addressed later down in the report as we encounter these issues.
+# # ACCESSING DATA
+```{r}
+head(netflix_data$Title, n = 100)
+```
+```{r}
+class(netflix_data$Title)
+```
+```{r}
+typeof(netflix_data$Title)
+```
+We can view the details of the “Title” column, wee see that it is of the data type character.
+```{r}
+head(netflix_data[,1], n = 100)
+```
+We can view the details of the “Title” column, wee see that it is of the data type character.
+```{r}
+head(netflix_data[,1:3])
+```
+```{r}
+netflix_data[seq(1,100,10),'Title']
+```
+
+We can also access the data by using the seq() function as the input paramter, here we give the paramters to seq() as starting index 1, ending index 1000 and skipping 25 indices. We give the name ‘Title’ as the column paramter to output the values only for that specific column. We can also use the head() and tail() functions that give the first/last 6(Default) entires for the data frame respectively.
+```{r}
+max(netflix_data$IMDB.Score)
+```
+```{r}
+typeof(netflix_data$IMDB.Score)
+```
+```{r}
+head(as.numeric(netflix_data$IMDB.Score), n = 100)
+```
+When we try to use the function max() on the column “IMDB_Score” we expect to find the highest score, yet we are returned with the value “Unknown”, this is because 1. The data is in the data type character 2. Missing values in the data are considered “Unknown” To overcome this, we can convert this attribute to the data type of numeric, which will then allow us to perform mathematical functions on this data with ease, this is done with the command
+```{r}
+max(as.numeric(netflix_data$IMDB.Score), na.rm = TRUE)
+```
+Now, when we run the max() function on the converted data, we get 9 as the value being returned, this is the maximum score given to any show on this database. We specifiy the parameter “na.rm” as TRUE, this is done to remove unknown(NA) values from the data when performing the function.
+```{r}
+min(as.numeric(netflix_data$IMDB.Score), na.rm = TRUE)
+```
+In similar fashion, we can also use this method to find the lowest rated show, which has a rating of 2.5. Although, this raises a question, while we are able to find out the lowest and highest values within the “IMDB.Score” column, we are unaware of which shows these scores these belong to, we don’t have access to the details of these shows that have the highest and lowest rated shows, to get around this we can use the function “which()”, this allows us to find the index of the score returned by the function. First we use the command
+```{r}
+which.max(as.numeric(netflix_data$IMDB.Score))
+```
+This returns the value 584 we understand that this is the row index of the show that has the maximum score of 9, next we provide the which function that returns the index as the row index parameter, and “1:3” for the column parameter, as we only want to know the columns 1. MAL_ID 2. Name 3.Score for the data
+```{r}
+netflix_data[ which.max(as.numeric(netflix_data$IMDB.Score)) , 1:3 ]
+```
+```{r}
+runtime = as.numeric(netflix_data$Runtime)
+```
+So far, we’ve been using “as.numeric(Netflix_data$Runtime)” everytime we wish to deal with the Score column of the data, this can tend to get tedious, instead we can store this data in the numeric data type format within a vector variable say “runtime”, now we can perform our mathematical operations on this vector. Next, we run a number of simple mathematical functions such as sum() to get the sum of all elements in the vector, sd() to find the standard deviation, var() to find the variance.
+```{r}
+length(runtime)
+```
+```{r}
+mean(runtime, na.rm = TRUE)
+```
+```{r}
+median(runtime, na.rm = TRUE)
+```
+```{r}
+sum(runtime, na.rm = TRUE)
+```
+```{r}
+sd(runtime, na.rm = TRUE)
+```
+```{r}
+var(runtime, na.rm = TRUE)
+```
+```{r}
+cumsum(runtime[1:20])
+```
+```{r}
+cummax(runtime[20:40])
+```
+```{r}
+cummin(runtime[20:40])
+```
+We have cumulative functions such as cumsum(), cummax() and cummin() which gives us the cumulative function result upto that point in the vector, here we give a subset of 20 values( 1:20 or 20:40) to the functions.
+```{r}
+head(sort(runtime), n = 100)
+```
+When we run the sort() function on the entire vector, we are returned with all the scores sorted in ascending order, the rank() function returns the rank of each entry i.e the scores are ranked, with the lowest scoring show being given rank 1 and so on.
+```{r}
+ head(rank(runtime), n = 100)
+```
+Allthough, when dealing with the data as a whole, it is hard to make complete sense of what these functions are doing, so we can access only a small subset of this data, we can use these functions on the first 20 elements of the vector
+```{r}
+runtime[1:20]
+```
+```{r}
+order(runtime[1:20])
+```
+```{r}
+rank(runtime[1:20])
+```
+```{r}
+sort(runtime[1:20])
+```
+Here, we can see with ease how these functions work, sort() orders the values from least score to largest. rank() assigns a rank for each score, it can be noted that two shows have the same score of 7.95, and these are both given the rank of 12.5. order() function tells us the original index of the sorted values, we can use this as indexes to our original data to display data.
+```{r}
+rank(runtime[1:20], ties.method = 'first')
+```
+```{r}
+rank(runtime[1:20], ties.method = 'max')
+```
+```{r}
+rank(runtime[1:20], ties.method = 'average')
+```
+Using this information we can plot a boxplot to visualize the data, but before that, suppose we wish to only plot the information for a sample of the data and not the data in its entirety, for this we can use the command “sample()” which returns a sample of the data that is completely random within the given constraints each time it is run, the command
+```{r}
+sample(1:nrow(netflix_data), 5)
+
+```
+```{r}
+netflix_data[sample(1:nrow(netflix_data), 5), 1:3]
+```
+Here, we use “1:nrow(Netflix_data)”, this uses all the rows of the data as the input parameter, nrow() returns the number of rows in the data, we use the number 5 as the size of the sample we wish to be returned
+```{r}
+sub_data = netflix_data$Runtime[sample(1:length(netflix_data$Runtime), 500)]
+```
+```{r}
+length(sub_data)
+```
+```{r}
+ quantile(sub_data, na.rm = TRUE)
+```
+# # DATA MANIPULATION
+```{r}
+new_netflix_data = as.data.frame(netflix_data[,1:3])
+```
+```{r}
+new_netflix_data[1:10,]
+```
+We can create a new data frame by using the function “as.data.frame()”, here we store the first columns of our orignal data as a new data frame within the variable “new_anime_data”.
+```{r}
+as.matrix(netflix_data[1:30,1:3])
+
+```
+```{r}
+ colnames(netflix_data[2:3])
+```
+```{r}
+ score = as.data.frame(netflix_data[2:3])
+head(score, n = 10)
+```
+```{r}
+ dim(netflix_data)
+```
+```{r}
+colnames(netflix_data)
+```
+# #Adding a Column to a Data Frame
+You want to add a column to a data frame.
+Use mutate() from dplyr to add a new column and assign values to it. This returns a
+new data frame, which you’ll typically want to save over the original.
+```{r}
+library(dplyr)
+vec=rep(c(1,2),292)
+head(netflix_data %>% mutate(new_col=vec),n=20)
+```
+```{r}
+ head(netflix_data,n=10)
+
+```
+```{r}
+dim(netflix_data)
+```
+# #Deleting a Column from a Data Frame
+Use select() from dplyr and specify the columns you want to drop by using - (a
+minus sign):
+
+```{r}
+head(select(netflix_data,-Runtime),n=20)
+```
+# # Renaming Columns in a Data Frame
+Use rename() from dplyr. This returns a new data frame:
+```{r}
+ netflix_data = rename(netflix_data, Genres = Genre)
+ head(netflix_data)
+```
+```{r}
+ head(select(netflix_data, Title, Premiere,Genres,everything()),n=10)
+```
+
+# #  Getting a Subset of a Data Frame
+Use filter() to get the rows, and select() to get the columns you want. These
+operations can be chained together using the %>% operator. These functions return a
+new data frame, so if you want to change the original variable, you’ll need to save the
+new result over it.
+```{r}
+filter(netflix_data, IMDB.Score > 8.0 & Genres=="Documentary") %>% select(Title, Language,IMDB.Score)
+```
+
+# # Changing the Order of Factor Levels
+Pass the factor to factor(), and give it the levels in the order you want. This returns
+a new factor, so if you want to change the original variable, you’ll need to save the
+new result over it:
+```{r}
+ nd <- netflix_data[c(1:30), c('Genres','IMDB.Score')]
+nd1_type=factor(c(nd$Genres))
+nd1_type
+```
+To reverse the level order, you can use rev(levels()) :
+```{r}
+ factor(nd1_type, levels = rev(levels(nd1_type)))
+```
+# # Changing the Order of Factor Levels Based on Data Values
+The order here is changed based on mean values we obtain (lowest to highest). we use the
+reorder command in which 3 parameter are used, the first one is the data set to be ordered
+the next 2 are used to obtain mean of each Category type
+
+```{r}
+nd1 <- netflix_data[c(1:30), c('Title','Language')]
+nd1
+```
+
+
+```{r}
+nd1$Language
+```
+
+
+
+# # Changing the Names of Factor Level
+We can give Shorthand names to the factor levels as i have done below,using the fct_recode
+,it used to make it less clutter free making it much easier to read the levels
+The second Method using do.call to combine all the commands in one line ,instead of having
+to manipulate the data on separate lines ,it does it one command and based on the order we
+have specified it follows that same order.
+
+
+```{r}
+iss <- netflix_data
+head(iss$Title,n=30)
+```
+
+# # Removing Unused Levels from a Factor
+
+```{r}
+unused_lvl=factor(netflix_data[1:10,"Language"])
+unused_lvl
+```
+```{r}
+new_unused_lvl <- unused_lvl[3:9]
+new_unused_lvl
+```
+```{r}
+droplevels(new_unused_lvl)
+```
+
+##Visualization of Bar graph of counts
+```{r}
+library(ggplot2)
+ggplot(netflix_data,aes(x=IMDB.Score))+geom_bar()
+```
+
+
+
+##Visualization of the histogram
+```{r}
+library(ggplot2)
+ggplot(netflix_data, aes(x = as.numeric(IMDB.Score))) +geom_histogram()
+
+```
+
+
+```{r}
+ggplot(netflix_data, aes(x = as.numeric(IMDB.Score))) +geom_histogram(binwidth = 4, fill = "white", colour = "black")
+```
